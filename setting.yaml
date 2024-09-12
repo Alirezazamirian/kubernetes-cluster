@@ -1,0 +1,16 @@
+---
+# cluster_name is used to group the nodes in a folder within VirtualBox:
+cluster_name: Kubernetes Cluster
+
+network:
+  control_ip: 192.168.56.101
+  dns_servers:
+    - 10.202.10.202
+    - 178.22.122.100
+  pod_cidr: 172.16.1.0/16
+  service_cidr: 172.18.1.0/18
+
+nodes:
+  workers:
+    count: 2
+
