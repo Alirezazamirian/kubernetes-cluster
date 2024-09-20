@@ -15,11 +15,12 @@ Vagrant.configure("2") do |config|
   config.vm.box_check_update = false
   config.vm.provision "shell", env: { "IP_NW" => IP_NW, "IP_START" => IP_START, "NUM_WORKER_NODES" => NUM_WORKER_NODES, "DNS_SERVERS1" => DNS_SERVERS1, "DNS_SERVERS2" => DNS_SERVERS2  }, inline: <<-SHELL
       echo "$IP_NW$((IP_START)) master-node.local master_node" >> /etc/hosts
-      temp_file=$(mktemp)
-      echo "nameserver $DNS_SERVERS1" > "$temp_file"
-      echo "nameserver $DNS_SERVERS2" >> "$temp_file"
-      cat /etc/resolv.conf >> "$temp_file"
-      mv "$temp_file" /etc/resolv.conf
+      sudo systemctl disable systemd-resolved.service
+      sudo systemctl stop systemd-resolved.service
+      sudo rm /etc/resolv.conf
+      touch /etc/resolv.conf
+      echo "nameserver $DNS_SERVERS1" > /etc/resolv.conf
+      echo "nameserver $DNS_SERVERS2" >> /etc/resolv.conf
       for i in `seq 1 ${NUM_WORKER_NODES}`; do
         echo "$IP_NW$((IP_START+i)) worker-node${i}.local worker_node${i}" >> /etc/hosts
       done
@@ -31,6 +32,7 @@ Vagrant.configure("2") do |config|
     master_node.vm.hostname = "master-node.local"
     master_node.vm.box = "bento/ubuntu-22.04"
     master_node.vm.network :private_network, ip: "192.168.56.101"
+    master_node.vm.network "public_network"
 
     master_node.vm.provision "shell",
       path: "scripts/common.sh"

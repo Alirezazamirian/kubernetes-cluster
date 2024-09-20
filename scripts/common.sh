@@ -3,7 +3,7 @@
 
 set -euxo pipefail
 
-sudo systemctl restart systemd-resolved
+
 # disable swap
 sudo swapoff -a
 
